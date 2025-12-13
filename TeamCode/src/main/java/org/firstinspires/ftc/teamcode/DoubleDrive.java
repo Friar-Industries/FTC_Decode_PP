@@ -153,12 +153,14 @@ public class DoubleDrive extends OpMode {
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.resetPosAndIMU();
-        pinpoint.setOffsets(2173.9558883737373, -1516.9506165959058, DistanceUnit.INCH);
 
-        shooterLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        pinpoint.setEncoderResolution(19.894,DistanceUnit.MM);
+        pinpoint.setOffsets(-67,-121,DistanceUnit.MM);
 
-        initAprilTag();
+        huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
+
+        //initAprilTag();
 
     }
     @Override
@@ -178,7 +180,7 @@ public class DoubleDrive extends OpMode {
             blueTeam = false;
         }
 
-        binPos = blueTeam ? new Pose2D(DistanceUnit.INCH,-30,96,AngleUnit.DEGREES,0) : new Pose2D(DistanceUnit.INCH,30,96,AngleUnit.DEGREES,0);
+        binPos = blueTeam ? new Pose2D(DistanceUnit.INCH,72,0,AngleUnit.DEGREES,0) : new Pose2D(DistanceUnit.INCH,72,144,AngleUnit.DEGREES,0);
     }
 
     @Override
@@ -195,7 +197,7 @@ public class DoubleDrive extends OpMode {
         double yaw = gamepad1.right_stick_x;
 
         if (gamepad1.a) {
-            yaw = pinpoint.getHeading(AngleUnit.DEGREES) - getTargetYaw(binPos);
+            yaw = getAprilTagPosX()/160;
         }
 
         double frontLeftPower = axial + lateral + yaw;
@@ -288,10 +290,12 @@ public class DoubleDrive extends OpMode {
 
         telemetry.addData("Power", power);
         telemetry.addData("Speed",speed);
-        telemetry.addData("X",pinpoint.getEncoderX());
-        telemetry.addData("Y",pinpoint.getEncoderY());
+        telemetry.addData("X",pinpoint.getPosX(DistanceUnit.INCH));
+        telemetry.addData("Y",pinpoint.getPosY(DistanceUnit.INCH));
+        telemetry.addData("Encoder X",pinpoint.getEncoderX());
+        telemetry.addData("Encoder Y",pinpoint.getEncoderY());
         telemetry.addData("Heading",pinpoint.getHeading(AngleUnit.DEGREES));
-        telemetryAprilTag();
+        //telemetryAprilTag();
         telemetry.addData("Elapsed Time", runtime.milliseconds() / 1000);
         telemetry.update();
     }
@@ -396,7 +400,7 @@ public class DoubleDrive extends OpMode {
 
     @Override
     public void stop() {
-        visionPortal.close();
+        //visionPortal.close();
         super.stop();
     }
 }
