@@ -190,10 +190,7 @@ public class DoubleDrive extends OpMode {
         if (gamepad1.a) {
             yaw = getAprilTagPosX()/160;
         }
-// 0-160 times KP
-        // set yaw as last error
-        // yaw - last error times kd
-        // lateral = lateral times correction
+
         double frontLeftPower = axial + lateral + yaw;
         double frontRightPower = axial - lateral - yaw;
         double backLeftPower = axial - lateral + yaw;
