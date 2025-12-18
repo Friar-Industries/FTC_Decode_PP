@@ -212,6 +212,10 @@ public class DoubleDrive extends OpMode {
         backLeftPower *= speed;
         backRightPower *= speed;
 
+        if (gamepad1.bWasPressed()) {
+            pinpoint.resetPosAndIMU();
+        }
+
 
         // CHANGE SHOOTER POWER MANUALLY
         /*
