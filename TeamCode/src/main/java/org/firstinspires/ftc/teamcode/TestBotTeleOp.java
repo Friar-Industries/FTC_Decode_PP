@@ -53,10 +53,10 @@ public class TestBotTeleOp extends OpMode {
 
     @Override
     public void init() {
-        frontLeft = hardwareMap.get(DcMotor.class, "motor_front_left");
-        backLeft = hardwareMap.get(DcMotor.class, "motor_back_left");
-        frontRight = hardwareMap.get(DcMotor.class, "motor_front_right");
-        backRight = hardwareMap.get(DcMotor.class, "motor_back_right");
+        frontLeft = hardwareMap.get(DcMotor.class, "front_left_motor");
+        backLeft = hardwareMap.get(DcMotor.class, "back_left_motor");
+        frontRight = hardwareMap.get(DcMotor.class, "front_right_motor");
+        backRight = hardwareMap.get(DcMotor.class, "back_right_motor");
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
