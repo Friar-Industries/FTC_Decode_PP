@@ -30,6 +30,8 @@ X -
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -37,6 +39,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 @TeleOp(name="TestBotTeleOp", group="A")
 public class TestBotTeleOp extends OpMode {
@@ -50,6 +53,7 @@ public class TestBotTeleOp extends OpMode {
     private DcMotor frontRight;
     private DcMotor backRight;
     private GoBildaPinpointDriver pinpoint;
+    private Limelight3A limelight;
 
     @Override
     public void init() {
@@ -73,6 +77,11 @@ public class TestBotTeleOp extends OpMode {
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        telemetry.setMsTransmissionInterval(11);
+        limelight.pipelineSwitch(0);
+        limelight.start();
+
     }
     @Override
     public void init_loop() {
@@ -95,6 +104,20 @@ public class TestBotTeleOp extends OpMode {
         runtime.reset();
     }
 
+    public double getAprilTagPosX() {
+        LLResult result = limelight.getLatestResult();
+        if (result != null) {
+            if (result.isValid()) {
+                Pose3D botpose = result.getBotpose();
+                telemetry.addData("tx", result.getTx());
+                telemetry.addData("ty", result.getTy());
+                telemetry.addData("Botpose", botpose.toString());
+                return result.getTx();
+            }
+        }
+        return 0;
+    }
+
     @Override
     public void loop() {
         double max;
@@ -102,6 +125,10 @@ public class TestBotTeleOp extends OpMode {
         double axial = -gamepad1.left_stick_y;
         double lateral = gamepad1.left_stick_x;
         double yaw = gamepad1.right_stick_x;
+
+        if (gamepad1.a) {
+            yaw = Math.min(getAprilTagPosX()/31,1);
+        }
 
         double frontLeftPower = axial + lateral + yaw;
         double frontRightPower = axial - lateral - yaw;
