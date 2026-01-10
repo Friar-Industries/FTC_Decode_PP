@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -47,11 +48,13 @@ public class TestBotTeleOp extends OpMode {
     private double speed = 1;
     private final double LOW_SPEED = 0.6;
     private final double HIGH_SPEED = 1;
+    private final double SERVO_INCREMENT = (double) 120/1800;
     private boolean blueTeam = true; // TRUE = BLUE TEAM, FALSE = RED TEAM
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor frontRight;
     private DcMotor backRight;
+    private Servo sorter;
     private GoBildaPinpointDriver pinpoint;
     private Limelight3A limelight;
 
@@ -76,6 +79,9 @@ public class TestBotTeleOp extends OpMode {
 
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+
+        sorter = hardwareMap.get(Servo.class, "sorter");
+        sorter.setPosition(0.5);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         telemetry.setMsTransmissionInterval(11);
@@ -159,6 +165,14 @@ public class TestBotTeleOp extends OpMode {
 
         if (gamepad1.leftBumperWasPressed()) {
             pinpoint.resetPosAndIMU();
+        }
+
+        if (gamepad1.aWasPressed()) {
+            sorter.setPosition(sorter.getPosition() - SERVO_INCREMENT);
+        } else if (gamepad1.bWasPressed()) {
+            sorter.setPosition(sorter.getPosition() + SERVO_INCREMENT);
+        } else if (gamepad1.yWasPressed()) {
+            sorter.setPosition(0.5);
         }
 
         frontLeft.setPower(frontLeftPower);

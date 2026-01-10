@@ -23,7 +23,14 @@ A - hold to turn robot to shooting angle
 
 BRODY:
 Dpad Up - Toggle flywheel
-X -
+Dpad Down - Toggle intake
+Dpad Left - Toggle feed servos
+Right Bumper - Shoot ball
+X - Cycle sorter left
+B - Cycle sorter right
+Y - Home sorter
+
+
 
 */
 
@@ -34,6 +41,8 @@ import android.annotation.SuppressLint;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -46,6 +55,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -66,35 +76,51 @@ public class DoubleDrive extends OpMode {
     private double speed = 1;
     private final double LOW_SPEED = 0.6;
     private final double HIGH_SPEED = 1;
+    private final double SERVO_INCREMENT = (double) 120/1800;
     private boolean intakeSpinning = false;
-    private boolean spinning = false;
+    private boolean feedSpinning = false;
+    private boolean shooterSpinning = false;
     private boolean blueTeam = true; // TRUE = BLUE TEAM, FALSE = RED TEAM
     private DcMotor shooterLeft;
     private DcMotor shooterRight;
-    private Servo intakeLeft;
-    private Servo intakeRight;
-    private Servo feed;
+    private DcMotor intake;
+    private Servo feedLeft;
+    private Servo feedRight;
     private Servo flick;
+    private Servo sorter;
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor frontRight;
     private DcMotor backRight;
+    private Limelight3A limelight;
     private HuskyLens huskyLens;
     private GoBildaPinpointDriver pinpoint;
 
     public int[] readObelisk() {
         int[] pattern = {0,0,0};
-        HuskyLens.Block[] blocks = huskyLens.blocks();
-        for (HuskyLens.Block block : blocks) {
-            pattern[block.id - 1] = 1;
+        LLResult result = limelight.getLatestResult();
+        if (result != null) {
+            if (result.isValid()) {
+                Pose3D botpose = result.getBotpose();
+
+                telemetry.addData("tx", result.getTx());
+                telemetry.addData("ty", result.getTy());
+                telemetry.addData("Botpose", botpose.toString());
+            }
         }
         return pattern;
     }
 
     public double getAprilTagPosX() {
-        HuskyLens.Block[] blocks = huskyLens.blocks();
-        for (HuskyLens.Block block : blocks) {
-            return block.x - 160;
+        LLResult result = limelight.getLatestResult();
+        if (result != null) {
+            if (result.isValid()) {
+                Pose3D botpose = result.getBotpose();
+                telemetry.addData("tx", result.getTx());
+                telemetry.addData("ty", result.getTy());
+                telemetry.addData("Botpose", botpose.toString());
+                return result.getTx();
+            }
         }
         return 0;
     }
@@ -123,7 +149,7 @@ public class DoubleDrive extends OpMode {
         frontRight = hardwareMap.get(DcMotor.class, "front_right");
         backRight = hardwareMap.get(DcMotor.class, "back_right");
 
-        huskyLens = hardwareMap.get(HuskyLens.class, "camera");
+        // huskyLens = hardwareMap.get(HuskyLens.class, "camera");
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -135,13 +161,13 @@ public class DoubleDrive extends OpMode {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        intakeLeft = hardwareMap.get(Servo.class, "intake_left");
-        intakeLeft.setDirection(Servo.Direction.REVERSE);
-        intakeRight = hardwareMap.get(Servo.class, "intake_right");
-        intakeRight.setDirection(Servo.Direction.FORWARD);
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        feed = hardwareMap.get(Servo.class, "feed");
-        feed.setDirection(Servo.Direction.REVERSE);
+        feedLeft = hardwareMap.get(Servo.class, "feed_left");
+        feedLeft.setDirection(Servo.Direction.REVERSE);
+        feedRight = hardwareMap.get(Servo.class, "feed_right");
+        feedRight.setDirection(Servo.Direction.FORWARD);
         flick = hardwareMap.get(Servo.class, "flick");
         flick.setDirection(Servo.Direction.FORWARD);
 
@@ -151,7 +177,10 @@ public class DoubleDrive extends OpMode {
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setOffsets(-73.51,-165.8,DistanceUnit.MM);
 
-        huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
+        sorter = hardwareMap.get(Servo.class, "sorter");
+        sorter.setPosition(0.5);
+
+        // huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
 
         shooterLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -212,11 +241,6 @@ public class DoubleDrive extends OpMode {
         backLeftPower *= speed;
         backRightPower *= speed;
 
-        if (gamepad1.bWasPressed()) {
-            pinpoint.resetPosAndIMU();
-        }
-
-
         // CHANGE SHOOTER POWER MANUALLY
         /*
         if (gamepad1.dpadDownWasPressed()) {
@@ -246,22 +270,33 @@ public class DoubleDrive extends OpMode {
 
         // SPIN SHOOTER
         if (gamepad2.dpadUpWasPressed()) {
-            spinning = !spinning;
+            shooterSpinning = !shooterSpinning;
         }
 
         if (gamepad2.xWasPressed()) {
-            intakeSpinning = !intakeSpinning;
+            sorter.setPosition(sorter.getPosition() - SERVO_INCREMENT);
+        } else if (gamepad2.bWasPressed()) {
+            sorter.setPosition(sorter.getPosition() + SERVO_INCREMENT);
+        } else if (gamepad2.yWasPressed()) {
+            sorter.setPosition(0.5);
         }
 
-        intakeLeft.setPosition(intakeSpinning ? 1 : 0.5);
-        intakeRight.setPosition(intakeSpinning ? 1 : 0.5);
-        feed.setPosition(intakeSpinning ? 1 : 0.5);
+        if (gamepad2.dpadDownWasPressed()) {
+            intakeSpinning = !intakeSpinning;
+        }
+        if (gamepad2.dpadLeftWasPressed()) {
+            feedSpinning = !feedSpinning;
+        }
 
-        shooterLeft.setPower(spinning ? power : 0);
-        shooterRight.setPower(spinning ? power : 0);
+        feedLeft.setPosition(feedSpinning ? 1 : 0.5);
+        feedRight.setPosition(feedSpinning ? 1 : 0.5);
+        intake.setPower(intakeSpinning ? 1 : 0);
+
+        shooterLeft.setPower(shooterSpinning ? power : 0);
+        shooterRight.setPower(shooterSpinning ? power : 0);
 
         // FLICK BALL INTO SHOOTER
-        if (gamepad2.y) {
+        if (gamepad2.rightBumperWasPressed()) {
             flick.setPosition(1);
         } else {
             flick.setPosition(0);
