@@ -25,11 +25,27 @@ public class SorterTesting extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.xWasPressed()) {
-            sorter.setPosition(sorter.getPosition() - SERVO_INCREMENT);
+            moveSorter(-SERVO_INCREMENT);
         } else if (gamepad1.bWasPressed()) {
-            sorter.setPosition(sorter.getPosition() + SERVO_INCREMENT);
+            moveSorter(SERVO_INCREMENT);
         } else if (gamepad1.yWasPressed()) {
             sorter.setPosition(0.5);
         }
+    }
+
+    public void moveSorter(double increment) {
+        double currentPos = sorter.getPosition();
+        double finalPos = currentPos + increment;
+        double extra = increment/10;
+        sorter.setPosition(currentPos + extra);
+        sorter.setPosition(finalPos);
+    }
+
+    public void homeSorter() {
+        double currentPos = sorter.getPosition();
+        if (0.5 - currentPos < 0) {
+            sorter.setPosition(0.48);
+        }
+        sorter.setPosition(0.5);
     }
 }
