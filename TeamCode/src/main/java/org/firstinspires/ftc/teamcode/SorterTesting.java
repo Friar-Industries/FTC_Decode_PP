@@ -13,10 +13,12 @@ import java.util.List;
 @TeleOp(name="SorterTesting", group="A")
 public class SorterTesting extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
-    private final double SERVO_INCREMENT = .09;
+    private final double SORTER_LEFT = 0.06;
+    private final double SORTER_RIGHT = 0.93;
     private int[] balls = {0,0,0};
     private int[] pattern = {0,0,0};
     private Servo sorter;
+    /*
     private Limelight3A limelight;
 
     public int[] readObelisk() {
@@ -29,15 +31,21 @@ public class SorterTesting extends OpMode {
         return new int[] {0,0,0};
     }
 
+
+     */
     @Override
     public void init() {
         sorter = hardwareMap.get(Servo.class, "sorter");
         sorter.setPosition(0.5);
 
+
+        /*
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         telemetry.setMsTransmissionInterval(11);
         limelight.pipelineSwitch(0);
         limelight.start();
+        
+         */
     }
 
     @Override
@@ -48,21 +56,36 @@ public class SorterTesting extends OpMode {
     @Override
     public void loop() {
         if (gamepad1.xWasPressed()) {
-            moveSorter(-SERVO_INCREMENT);
+            sorter.setPosition(SORTER_LEFT);
         } else if (gamepad1.bWasPressed()) {
-            moveSorter(SERVO_INCREMENT);
+            sorter.setPosition(SORTER_RIGHT);
         } else if (gamepad1.yWasPressed()) {
             sorter.setPosition(0.5);
         }
     }
 
-    public void moveSorter(double increment) {
+    /*
+    public void moveSorter(int sorterCase) {
         double currentPos = sorter.getPosition();
-        double finalPos = currentPos + increment;
-        double extra = increment/10;
-        sorter.setPosition(currentPos + extra);
-        sorter.setPosition(finalPos);
+        double finalPos = currentPos + (SERVO_INCREMENT * (sorterCase - 1));
+        double extra = SERVO_INCREMENT/10 * (sorterCase - 1);
+
+        switch (sorterCase) {
+            case 0:
+                if (runtime.milliseconds() > 500) {
+                    sorter.setPosition(finalPos);
+                } else {
+                    sorter.setPosition(finalPos + extra);
+                }
+            case 1:
+
+            case 2:
+
+            case 3:
+
+        }
     }
+     */
 
     public void homeSorter() {
         double currentPos = sorter.getPosition();

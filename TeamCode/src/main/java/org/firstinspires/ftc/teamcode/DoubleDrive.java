@@ -76,16 +76,21 @@ public class DoubleDrive extends OpMode {
     private double speed = 1;
     private final double LOW_SPEED = 0.6;
     private final double HIGH_SPEED = 1;
+    private final double FINGER_HOME = 0.3;
+    private final double FINGER_ACTIVE = 0.8;
     private final double SERVO_INCREMENT = (double) 120/1800;
-    private boolean intakeSpinning = false;
+    /*private boolean intakeSpinning = false;
     private boolean feedSpinning = false;
+    */
     private boolean shooterSpinning = false;
     private boolean blueTeam = true; // TRUE = BLUE TEAM, FALSE = RED TEAM
     private DcMotor shooterLeft;
     private DcMotor shooterRight;
+    /*
     private DcMotor intake;
     private Servo feedLeft;
     private Servo feedRight;
+    */
     private Servo flick;
     private Servo sorter;
     private DcMotor frontLeft;
@@ -161,6 +166,7 @@ public class DoubleDrive extends OpMode {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        /*
         intake = hardwareMap.get(DcMotor.class, "intake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -168,8 +174,11 @@ public class DoubleDrive extends OpMode {
         feedLeft.setDirection(Servo.Direction.REVERSE);
         feedRight = hardwareMap.get(Servo.class, "feed_right");
         feedRight.setDirection(Servo.Direction.FORWARD);
+
+         */
         flick = hardwareMap.get(Servo.class, "flick");
         flick.setDirection(Servo.Direction.FORWARD);
+        flick.setPosition(FINGER_HOME);
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
@@ -281,6 +290,8 @@ public class DoubleDrive extends OpMode {
             sorter.setPosition(0.5);
         }
 
+        /*
+
         if (gamepad2.dpadDownWasPressed()) {
             intakeSpinning = !intakeSpinning;
         }
@@ -292,14 +303,15 @@ public class DoubleDrive extends OpMode {
         feedRight.setPosition(feedSpinning ? 1 : 0.5);
         intake.setPower(intakeSpinning ? 1 : 0);
 
+         */
         shooterLeft.setPower(shooterSpinning ? power : 0);
         shooterRight.setPower(shooterSpinning ? power : 0);
 
         // FLICK BALL INTO SHOOTER
         if (gamepad2.rightBumperWasPressed()) {
-            flick.setPosition(1);
+            flick.setPosition(FINGER_ACTIVE);
         } else {
-            flick.setPosition(0);
+            flick.setPosition(FINGER_HOME);
         }
 
         // CHANGE POWER MANUALLY BY .05
