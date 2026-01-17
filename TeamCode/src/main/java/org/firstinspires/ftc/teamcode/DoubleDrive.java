@@ -76,8 +76,10 @@ public class DoubleDrive extends OpMode {
     private double speed = 1;
     private final double LOW_SPEED = 0.6;
     private final double HIGH_SPEED = 1;
-    private final double FINGER_HOME = 0.3;
-    private final double FINGER_ACTIVE = 0.8;
+    private final double FINGER_HOME = 1;
+    private final double FINGER_ACTIVE = 0.1;
+    private final double SORTER_LEFT = 0.06;
+    private final double SORTER_RIGHT = 0.93;
     private final double SERVO_INCREMENT = (double) 120/1800;
     /*private boolean intakeSpinning = false;
     private boolean feedSpinning = false;
@@ -282,11 +284,11 @@ public class DoubleDrive extends OpMode {
             shooterSpinning = !shooterSpinning;
         }
 
-        if (gamepad2.xWasPressed()) {
-            sorter.setPosition(sorter.getPosition() - SERVO_INCREMENT);
-        } else if (gamepad2.bWasPressed()) {
-            sorter.setPosition(sorter.getPosition() + SERVO_INCREMENT);
-        } else if (gamepad2.yWasPressed()) {
+        if (gamepad1.xWasPressed()) {
+            sorter.setPosition(SORTER_LEFT);
+        } else if (gamepad1.bWasPressed()) {
+            sorter.setPosition(SORTER_RIGHT);
+        } else if (gamepad1.yWasPressed()) {
             sorter.setPosition(0.5);
         }
 
@@ -308,7 +310,7 @@ public class DoubleDrive extends OpMode {
         shooterRight.setPower(shooterSpinning ? power : 0);
 
         // FLICK BALL INTO SHOOTER
-        if (gamepad2.rightBumperWasPressed()) {
+        if (gamepad2.right_bumper) {
             flick.setPosition(FINGER_ACTIVE);
         } else {
             flick.setPosition(FINGER_HOME);
