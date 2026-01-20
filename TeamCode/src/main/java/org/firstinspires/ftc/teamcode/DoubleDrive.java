@@ -31,6 +31,20 @@ B - Cycle sorter right
 Y - Home sorter
 
 
+Expansion -
+Motor 0 front right
+motor 1 back right
+motor 2 shooter right
+servo 0 flick
+i2c 0 pinpoint
+
+Control -
+motor 0 shooter left
+motor 1 front left
+motor 2 back left
+servo 1 sorter
+
+
 
 */
 
@@ -126,7 +140,7 @@ public class DoubleDrive extends OpMode {
                 telemetry.addData("tx", result.getTx());
                 telemetry.addData("ty", result.getTy());
                 telemetry.addData("Botpose", botpose.toString());
-                return result.getTx();
+                return result.getTx() - 10;
             }
         }
         return 0;
@@ -196,6 +210,11 @@ public class DoubleDrive extends OpMode {
         shooterLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
+        limelight.start();
+
+        limelight.pipelineSwitch(0);
     }
     @Override
     public void init_loop() {
@@ -284,11 +303,11 @@ public class DoubleDrive extends OpMode {
             shooterSpinning = !shooterSpinning;
         }
 
-        if (gamepad1.xWasPressed()) {
+        if (gamepad2.yWasPressed()) {
             sorter.setPosition(SORTER_LEFT);
-        } else if (gamepad1.bWasPressed()) {
+        } else if (gamepad2.bWasPressed()) {
             sorter.setPosition(SORTER_RIGHT);
-        } else if (gamepad1.yWasPressed()) {
+        } else if (gamepad2.xWasPressed()) {
             sorter.setPosition(0.5);
         }
 

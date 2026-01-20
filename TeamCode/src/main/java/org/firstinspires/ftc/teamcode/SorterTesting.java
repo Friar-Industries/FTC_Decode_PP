@@ -41,7 +41,7 @@ public class SorterTesting extends OpMode {
 
         /*
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        telemetry.setMsTransmissionInterval(11);
+        telemetry.setMsTransmissionInterval(11);k
         limelight.pipelineSwitch(0);
         limelight.start();
         

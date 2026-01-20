@@ -90,7 +90,7 @@ public class ServoPositionHelper extends LinearOpMode {
          * Initialize the hardware variables, string here must exactly match the name of a configured
          * servo in the Robot Configuration on your Driver Station.
          */
-        servo = hardwareMap.get(Servo.class, "flick");
+        servo = hardwareMap.get(Servo.class, "sorter");
 
         /*
          * Set the servo to an initial position of 0.5, we do this before the while (opModeIsActive())
