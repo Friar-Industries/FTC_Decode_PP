@@ -15,13 +15,18 @@ public class TestBotAuton extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
 
-    private final Pose startPose = new Pose(0,0,0);
-    private final Pose endPose = new Pose(20,-10,-90);
+    private final Pose startPose = new Pose(104,136,Math.toRadians(270));
+    private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(45));
+    private final Pose endPose = new Pose(95.88,73,Math.toRadians(45));
     private Path firstPath;
+    private Path secondPath;
 
     public void buildPaths() {
-        firstPath = new Path(new BezierLine(startPose,endPose));
-        firstPath.setLinearHeadingInterpolation(startPose.getHeading(),endPose.getHeading());
+
+        firstPath = new Path(new BezierLine(startPose,shootPose));
+        firstPath.setLinearHeadingInterpolation(startPose.getHeading(),shootPose.getHeading());
+        secondPath = new Path(new BezierLine(shootPose,endPose));
+        secondPath.setLinearHeadingInterpolation(shootPose.getHeading(),endPose.getHeading());
     }
 
     public void autonomousPathUpdate() {
@@ -29,6 +34,10 @@ public class TestBotAuton extends OpMode {
             case 0:
                 follower.followPath(firstPath);
                 setPathState(1);
+                break;
+            case 1:
+                follower.followPath(secondPath);
+                setPathState(2);
                 break;
         }
     }
