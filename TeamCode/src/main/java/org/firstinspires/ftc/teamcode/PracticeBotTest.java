@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="PracticeBotTest", group="Sensor")
 public class PracticeBotTest extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
-    private double power = 1;
-    private int pattern = 0;
+    private double power = 0.5;
+    private boolean shooterOn = false;
     private DcMotor shooter;
     private Servo shooterRight;
     private Servo shooterLeft;
@@ -26,7 +26,7 @@ public class PracticeBotTest extends LinearOpMode {
         leftDrive = hardwareMap.get(DcMotor.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
         shooter.setDirection(DcMotorSimple.Direction.FORWARD);
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -59,11 +59,11 @@ public class PracticeBotTest extends LinearOpMode {
                 power += 0.05;
             }
 
-            if (gamepad1.a) {
-                shooter.setPower(power);
-            } else {
-                shooter.setPower(0);
+            if (gamepad1.aWasPressed()) {
+                shooterOn = !shooterOn;
             }
+
+            shooter.setPower(shooterOn ? power : 0);
 
             if (gamepad1.x) {
                 shooterLeft.setPosition(1);
@@ -92,7 +92,6 @@ public class PracticeBotTest extends LinearOpMode {
 
             telemetry.addData("Power", power);
             telemetry.addData("Elapsed Time", runtime.milliseconds() / 1000);
-            telemetry.addData("Pattern", pattern);
             telemetry.update();
         }
     }
