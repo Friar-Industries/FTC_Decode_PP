@@ -1,25 +1,12 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
-import static java.lang.Thread.sleep;
-
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Autonomous(name = "TestBotAuton", group = "A")
 public class TestBotAuton extends OpMode {
@@ -27,23 +14,13 @@ public class TestBotAuton extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
-    private final Pose startPose = new Pose(104,136,Math.toRadians(90));
-    private final Pose obeliskPose = new Pose(84,112,Math.toRadians(105));
+    private final Pose startPose = new Pose(104,136,Math.toRadians(270));
+    private final Pose obeliskPose = new Pose();
     private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(45));
     private final Pose endPose = new Pose(95.88,73,Math.toRadians(45));
     private Path firstPath;
     private Path secondPath;
     private Path thirdPath;
-    private DcMotor shooterLeft;
-    private DcMotor shooterRight;
-    private Servo flick;
-    private Servo sorter;
-    private Limelight3A limelight;
-    private final double FINGER_HOME = 1;
-    private final double FINGER_ACTIVE = 0.1;
-    private final double SORTER_LEFT = 0.06;
-    private final double SORTER_RIGHT = 0.93;
-    private int[] pattern = {0,0,0};
 
     public void buildPaths() {
         firstPath = new Path(new BezierLine(startPose,obeliskPose));
@@ -54,7 +31,7 @@ public class TestBotAuton extends OpMode {
         thirdPath.setLinearHeadingInterpolation(shootPose.getHeading(),endPose.getHeading());
     }
 
-    public void autonomousPathUpdate() throws InterruptedException {
+    public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
                 follower.followPath(firstPath);
@@ -62,18 +39,11 @@ public class TestBotAuton extends OpMode {
                 break;
             case 1:
                 if(!follower.isBusy()) {
-                    pattern = readObelisk();
-
                     follower.followPath(secondPath,true);
                     setPathState(2);
                 }
             case 2:
                 if(!follower.isBusy()) {
-                    setShooterPower(0.75);
-                    sleep(500);
-                    flickBall();
-                    sleep(1000);
-
                     follower.followPath(thirdPath,true);
                     setPathState(3);
                 }
@@ -90,17 +60,12 @@ public class TestBotAuton extends OpMode {
     @Override
     public void loop() {
         follower.update();
-        try {
-            autonomousPathUpdate();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        autonomousPathUpdate();
 
         telemetry.addData("Path State", pathState);
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y",follower.getPose().getY());
         telemetry.addData("Heading",follower.getPose().getHeading());
-        telemetry.addData("Pattern", Arrays.toString(pattern));
         telemetry.update();
     }
 
@@ -110,60 +75,9 @@ public class TestBotAuton extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        shooterLeft = hardwareMap.get(DcMotor.class, "shooter_left");
-        shooterLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooterRight = hardwareMap.get(DcMotor.class, "shooter_right");
-        shooterRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        shooterLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        sorter = hardwareMap.get(Servo.class, "sorter");
-        sorter.setPosition(0.5);
-
-        flick = hardwareMap.get(Servo.class, "flick");
-        flick.setDirection(Servo.Direction.FORWARD);
-        flick.setPosition(FINGER_HOME);
-
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
-        limelight.start();
-
-        limelight.pipelineSwitch(0);
-
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
         follower.setStartingPose(startPose);
-    }
-
-    public void setShooterPower(double power) {
-        shooterLeft.setPower(power);
-        shooterRight.setPower(power);
-    }
-
-    public void flickBall() throws InterruptedException {
-        flick.setPosition(FINGER_ACTIVE);
-        sleep(1000);
-        flick.setPosition(FINGER_HOME);
-    }
-
-    public void moveSorter(double pos) {
-        sorter.setPosition(pos);
-    }
-
-    public int[] readObelisk() {
-        pattern = new int[]{0, 0, 0};
-        LLResult result = limelight.getLatestResult();
-        if (result != null) {
-            List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
-            for (LLResultTypes.FiducialResult fiducial : fiducials) {
-                int id = fiducial.getFiducialId();
-                pattern[id-21] = 1;
-            }
-        }
-        return pattern;
     }
 
     @Override
