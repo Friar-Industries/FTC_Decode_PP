@@ -35,6 +35,8 @@ Expansion -
 Motor 0 front right
 motor 1 back right
 motor 2 shooter right
+motor 3 intake
+
 servo 0 flick
 i2c 0 pinpoint
 
@@ -43,15 +45,10 @@ motor 0 shooter left
 motor 1 front left
 motor 2 back left
 servo 1 sorter
-
-
-
 */
 
 package org.firstinspires.ftc.teamcode;
 
-
-import android.annotation.SuppressLint;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -64,20 +61,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-
-import java.util.List;
-import java.util.Vector;
 
 
 @TeleOp(name="DoubleDrive", group="A")
@@ -95,15 +82,17 @@ public class DoubleDrive extends OpMode {
     private final double SORTER_LEFT = 0.06;
     private final double SORTER_RIGHT = 0.93;
     private final double SERVO_INCREMENT = (double) 120/1800;
-    /*private boolean intakeSpinning = false;
+    private boolean intakeSpinning = false;
+    /*
     private boolean feedSpinning = false;
     */
     private boolean shooterSpinning = false;
     private boolean blueTeam = true; // TRUE = BLUE TEAM, FALSE = RED TEAM
     private DcMotor shooterLeft;
     private DcMotor shooterRight;
-    /*
+
     private DcMotor intake;
+    /*
     private Servo feedLeft;
     private Servo feedRight;
     */
@@ -182,10 +171,11 @@ public class DoubleDrive extends OpMode {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        /*
+
         intake = hardwareMap.get(DcMotor.class, "intake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        /*
         feedLeft = hardwareMap.get(Servo.class, "feed_left");
         feedLeft.setDirection(Servo.Direction.REVERSE);
         feedRight = hardwareMap.get(Servo.class, "feed_right");
@@ -311,20 +301,24 @@ public class DoubleDrive extends OpMode {
             sorter.setPosition(0.5);
         }
 
-        /*
+
 
         if (gamepad2.dpadDownWasPressed()) {
             intakeSpinning = !intakeSpinning;
         }
+
+        /*
         if (gamepad2.dpadLeftWasPressed()) {
             feedSpinning = !feedSpinning;
         }
 
         feedLeft.setPosition(feedSpinning ? 1 : 0.5);
         feedRight.setPosition(feedSpinning ? 1 : 0.5);
-        intake.setPower(intakeSpinning ? 1 : 0);
 
          */
+        intake.setPower(intakeSpinning ? 1 : 0);
+
+
         shooterLeft.setPower(shooterSpinning ? power : 0);
         shooterRight.setPower(shooterSpinning ? power : 0);
 
