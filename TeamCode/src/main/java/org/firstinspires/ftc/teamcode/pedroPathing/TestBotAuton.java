@@ -1,7 +1,3 @@
-/*
-PRELOAD GREEN IN BOTTOM, PURPS ON TOP
- */
-
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
 import static java.lang.Thread.sleep;
@@ -46,10 +42,8 @@ public class TestBotAuton extends OpMode {
     private final double FINGER_HOME = 1;
     private final double FINGER_ACTIVE = 0.1;
     private final double SORTER_LEFT = 0.06;
-    private final double SORTER_HOME = 0.5;
     private final double SORTER_RIGHT = 0.93;
     private int[] pattern = {0,0,0};
-    private String patternState = "PPG";
 
     public void buildPaths() {
         firstPath = new Path(new BezierLine(startPose,obeliskPose));
@@ -69,24 +63,22 @@ public class TestBotAuton extends OpMode {
             case 1:
                 if(!follower.isBusy()) {
                     pattern = readObelisk();
-                    
-                    if (pattern[0] == 1) {
-                        patternState = "GPP";
-                    } else if (pattern[1] == 1) {
-                        patternState = "PGP";
-                    }
 
                     follower.followPath(secondPath,true);
                     setPathState(2);
                 }
             case 2:
                 if(!follower.isBusy()) {
-                    shootBalls(patternState);
+                    setShooterPower(0.75);
+                    sleep(500);
+                    flickBall();
+                    sleep(1000);
 
                     follower.followPath(thirdPath,true);
                     setPathState(3);
                 }
                 break;
+            case 3:
         }
     }
 
@@ -160,51 +152,7 @@ public class TestBotAuton extends OpMode {
     public void moveSorter(double pos) {
         sorter.setPosition(pos);
     }
-    
-    public void shootBalls(String state) throws InterruptedException {
-        setShooterPower(0.75);
-        int timeout = 1000;
-        switch (state) {
-            case "GPP":
-                sleep(500);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_LEFT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_RIGHT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-            case "PGP":
-                moveSorter(SORTER_LEFT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_HOME);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_RIGHT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-            case "PPG":
-                moveSorter(SORTER_LEFT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_RIGHT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_HOME);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-        }
-    }
+
     public int[] readObelisk() {
         pattern = new int[]{0, 0, 0};
         LLResult result = limelight.getLatestResult();
