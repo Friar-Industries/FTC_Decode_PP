@@ -30,14 +30,15 @@ public class TestBotAuton extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
     private final Pose startPose = new Pose(104,136,Math.toRadians(90));
-    private final Pose obeliskPose = new Pose(84,112,Math.toRadians(105));
-    private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(45));
-    private final Pose endPose = new Pose(95.88,73,Math.toRadians(45));
+    private final Pose obeliskPose = new Pose(84,112,Math.toRadians(100));
+    private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(55));
+    private final Pose endPose = new Pose(95.88,73,Math.toRadians(55));
     private Path firstPath;
     private Path secondPath;
     private Path thirdPath;
     private DcMotor shooterLeft;
     private DcMotor shooterRight;
+    private DcMotor intake;
     private Servo flick;
     private Servo sorter;
     private Limelight3A limelight;
@@ -45,7 +46,7 @@ public class TestBotAuton extends OpMode {
     private final double FINGER_ACTIVE = 0.1;
     private final double SORTER_LEFT = 0.06;
     private final double SORTER_HOME = 0.5;
-    private final double SORTER_RIGHT = 0.93;
+    private final double SORTER_RIGHT = 0.94;
     private int[] pattern = {0,0,0};
     private String patternState = "PPG";
 
@@ -79,7 +80,13 @@ public class TestBotAuton extends OpMode {
                 }
             case 2:
                 if(!follower.isBusy()) {
+                    intake.setPower(1);
+                    shooterLeft.setPower(.75);
+                    shooterRight.setPower(.75);
                     shootBalls(patternState);
+                    shooterLeft.setPower(0);
+                    shooterRight.setPower(0);
+                    intake.setPower(0);
 
                     follower.followPath(thirdPath,true);
                     setPathState(3);
@@ -126,6 +133,9 @@ public class TestBotAuton extends OpMode {
         shooterLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         shooterRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         sorter = hardwareMap.get(Servo.class, "sorter");
         sorter.setPosition(0.5);
 
@@ -160,7 +170,6 @@ public class TestBotAuton extends OpMode {
     }
     
     public void shootBalls(String state) throws InterruptedException {
-        setShooterPower(0.75);
         int timeout = 1000;
         switch (state) {
             case "GPP":

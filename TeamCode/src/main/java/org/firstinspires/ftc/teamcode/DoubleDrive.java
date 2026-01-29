@@ -80,7 +80,7 @@ public class DoubleDrive extends OpMode {
     private final double FINGER_HOME = 1;
     private final double FINGER_ACTIVE = 0.1;
     private final double SORTER_LEFT = 0.06;
-    private final double SORTER_RIGHT = 0.93;
+    private final double SORTER_RIGHT = 0.94;
     private final double SERVO_INCREMENT = (double) 120/1800;
     private boolean intakeSpinning = false;
     /*
@@ -352,6 +352,7 @@ public class DoubleDrive extends OpMode {
         telemetry.addData("Encoder X",pinpoint.getEncoderX());
         telemetry.addData("Encoder Y",pinpoint.getEncoderY());
         telemetry.addData("Heading",pinpoint.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("Sorter Pos",sorter.getPosition());
         //telemetryAprilTag();
         telemetry.addData("Elapsed Time", runtime.milliseconds() / 1000);
         telemetry.update();
