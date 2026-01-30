@@ -4,8 +4,6 @@ PRELOAD GREEN IN BOTTOM, PURPS ON TOP
 
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
-import static java.lang.Thread.sleep;
-
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -17,36 +15,30 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
+import org.firstinspires.ftc.teamcode.mechanisms.Sorter;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Autonomous(name = "TestBotAuton", group = "A")
-public class TestBotAuton extends OpMode {
+@Autonomous(name = "BlueAuton", group = "A")
+public class BlueAuton extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
-    private final Pose startPose = new Pose(104,136,Math.toRadians(90));
-    private final Pose obeliskPose = new Pose(84,112,Math.toRadians(100));
-    private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(55));
-    private final Pose endPose = new Pose(95.88,73,Math.toRadians(55));
+    private final Pose startPose = new Pose(39.5,135,Math.toRadians(90));
+    private final Pose obeliskPose = new Pose(60,112,Math.toRadians(80));
+    private final Pose shootPose = new Pose(58.35,84.28,Math.toRadians(125));
+    private final Pose endPose = new Pose(48.12,73,Math.toRadians(125));
     private Path firstPath;
     private Path secondPath;
     private Path thirdPath;
-    private DcMotor shooterLeft;
-    private DcMotor shooterRight;
     private DcMotor intake;
-    private Servo flick;
-    private Servo sorter;
+    private Shooter shooter = new Shooter();
+    private Sorter sorter = new Sorter();
     private Limelight3A limelight;
-    private final double FINGER_HOME = 1;
-    private final double FINGER_ACTIVE = 0.1;
-    private final double SORTER_LEFT = 0.06;
-    private final double SORTER_HOME = 0.5;
-    private final double SORTER_RIGHT = 0.94;
     private int[] pattern = {0,0,0};
     private String patternState = "PPG";
 
@@ -68,7 +60,7 @@ public class TestBotAuton extends OpMode {
             case 1:
                 if(!follower.isBusy()) {
                     pattern = readObelisk();
-                    
+
                     if (pattern[0] == 1) {
                         patternState = "GPP";
                     } else if (pattern[1] == 1) {
@@ -78,14 +70,13 @@ public class TestBotAuton extends OpMode {
                     follower.followPath(secondPath,true);
                     setPathState(2);
                 }
+                break;
             case 2:
                 if(!follower.isBusy()) {
                     intake.setPower(1);
-                    shooterLeft.setPower(.75);
-                    shooterRight.setPower(.75);
-                    shootBalls(patternState);
-                    shooterLeft.setPower(0);
-                    shooterRight.setPower(0);
+                    shooter.setPower(0.75);
+                    sorter.shootBallsInPattern(patternState);
+                    shooter.setPower(0);
                     intake.setPower(0);
 
                     follower.followPath(thirdPath,true);
@@ -123,25 +114,12 @@ public class TestBotAuton extends OpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
-        shooterLeft = hardwareMap.get(DcMotor.class, "shooter_left");
-        shooterLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooterRight = hardwareMap.get(DcMotor.class, "shooter_right");
-        shooterRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        shooterLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter.init(hardwareMap);
 
         intake = hardwareMap.get(DcMotor.class, "intake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        sorter = hardwareMap.get(Servo.class, "sorter");
-        sorter.setPosition(0.5);
-
-        flick = hardwareMap.get(Servo.class, "flick");
-        flick.setDirection(Servo.Direction.FORWARD);
-        flick.setPosition(FINGER_HOME);
+        sorter.init(hardwareMap);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
@@ -152,65 +130,6 @@ public class TestBotAuton extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
         follower.setStartingPose(startPose);
-    }
-
-    public void setShooterPower(double power) {
-        shooterLeft.setPower(power);
-        shooterRight.setPower(power);
-    }
-
-    public void flickBall() throws InterruptedException {
-        flick.setPosition(FINGER_ACTIVE);
-        sleep(1000);
-        flick.setPosition(FINGER_HOME);
-    }
-
-    public void moveSorter(double pos) {
-        sorter.setPosition(pos);
-    }
-    
-    public void shootBalls(String state) throws InterruptedException {
-        int timeout = 1000;
-        switch (state) {
-            case "GPP":
-                sleep(500);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_LEFT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_RIGHT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-            case "PGP":
-                moveSorter(SORTER_LEFT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_HOME);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_RIGHT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-            case "PPG":
-                moveSorter(SORTER_LEFT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_RIGHT);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-                moveSorter(SORTER_HOME);
-                sleep(timeout);
-                flickBall();
-                sleep(timeout);
-        }
     }
     public int[] readObelisk() {
         pattern = new int[]{0, 0, 0};

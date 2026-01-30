@@ -65,13 +65,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.teamcode.mechanisms.Shooter;
+import org.firstinspires.ftc.teamcode.mechanisms.Sorter;
 
 
 @TeleOp(name="DoubleDrive", group="A")
 public class DoubleDrive extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
-    private double power = 0.9;
-    private Pose2D binPos;
+    private double power = 0.75;
     private final double MIN_POWER = 0.75;
     private final double MAX_POWER = 0.9;
     private double speed = 1;
@@ -79,25 +80,15 @@ public class DoubleDrive extends OpMode {
     private final double HIGH_SPEED = 1;
     private final double FINGER_HOME = 1;
     private final double FINGER_ACTIVE = 0.1;
-    private final double SORTER_LEFT = 0.06;
-    private final double SORTER_RIGHT = 0.94;
-    private final double SERVO_INCREMENT = (double) 120/1800;
     private boolean intakeSpinning = false;
     /*
     private boolean feedSpinning = false;
     */
     private boolean shooterSpinning = false;
     private boolean blueTeam = true; // TRUE = BLUE TEAM, FALSE = RED TEAM
-    private DcMotor shooterLeft;
-    private DcMotor shooterRight;
-
+    private Sorter sorter = new Sorter();
+    private Shooter shooter = new Shooter();
     private DcMotor intake;
-    /*
-    private Servo feedLeft;
-    private Servo feedRight;
-    */
-    private Servo flick;
-    private Servo sorter;
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor frontRight;
@@ -144,22 +135,13 @@ public class DoubleDrive extends OpMode {
 
     @Override
     public void init() {
-        shooterLeft = hardwareMap.get(DcMotor.class, "shooter_left");
-        shooterLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooterRight = hardwareMap.get(DcMotor.class, "shooter_right");
-        shooterRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        shooterLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooter.init(hardwareMap);
+        sorter.init(hardwareMap);
 
         frontLeft = hardwareMap.get(DcMotor.class, "front_left");
         backLeft = hardwareMap.get(DcMotor.class, "back_left");
         frontRight = hardwareMap.get(DcMotor.class, "front_right");
         backRight = hardwareMap.get(DcMotor.class, "back_right");
-
-        // huskyLens = hardwareMap.get(HuskyLens.class, "camera");
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -171,34 +153,14 @@ public class DoubleDrive extends OpMode {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
         intake = hardwareMap.get(DcMotor.class, "intake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        /*
-        feedLeft = hardwareMap.get(Servo.class, "feed_left");
-        feedLeft.setDirection(Servo.Direction.REVERSE);
-        feedRight = hardwareMap.get(Servo.class, "feed_right");
-        feedRight.setDirection(Servo.Direction.FORWARD);
-
-         */
-        flick = hardwareMap.get(Servo.class, "flick");
-        flick.setDirection(Servo.Direction.FORWARD);
-        flick.setPosition(FINGER_HOME);
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setOffsets(-73.51,-165.8,DistanceUnit.MM);
-
-        sorter = hardwareMap.get(Servo.class, "sorter");
-        sorter.setPosition(0.5);
-
-        // huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
-
-        shooterLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
@@ -294,39 +256,25 @@ public class DoubleDrive extends OpMode {
         }
 
         if (gamepad2.yWasPressed()) {
-            sorter.setPosition(SORTER_LEFT);
+            sorter.left();
         } else if (gamepad2.bWasPressed()) {
-            sorter.setPosition(SORTER_RIGHT);
+            sorter.right();
         } else if (gamepad2.xWasPressed()) {
-            sorter.setPosition(0.5);
+            sorter.home();
         }
-
-
 
         if (gamepad2.dpadDownWasPressed()) {
             intakeSpinning = !intakeSpinning;
         }
 
-        /*
-        if (gamepad2.dpadLeftWasPressed()) {
-            feedSpinning = !feedSpinning;
-        }
-
-        feedLeft.setPosition(feedSpinning ? 1 : 0.5);
-        feedRight.setPosition(feedSpinning ? 1 : 0.5);
-
-         */
         intake.setPower(intakeSpinning ? 1 : 0);
-
-
-        shooterLeft.setPower(shooterSpinning ? power : 0);
-        shooterRight.setPower(shooterSpinning ? power : 0);
+        shooter.setPower(shooterSpinning ? power : 0);
 
         // FLICK BALL INTO SHOOTER
         if (gamepad2.right_bumper) {
-            flick.setPosition(FINGER_ACTIVE);
+            sorter.setFinger(FINGER_ACTIVE);
         } else {
-            flick.setPosition(FINGER_HOME);
+            sorter.setFinger(FINGER_HOME);
         }
 
         // CHANGE POWER MANUALLY BY .05
@@ -352,7 +300,6 @@ public class DoubleDrive extends OpMode {
         telemetry.addData("Encoder X",pinpoint.getEncoderX());
         telemetry.addData("Encoder Y",pinpoint.getEncoderY());
         telemetry.addData("Heading",pinpoint.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("Sorter Pos",sorter.getPosition());
         //telemetryAprilTag();
         telemetry.addData("Elapsed Time", runtime.milliseconds() / 1000);
         telemetry.update();

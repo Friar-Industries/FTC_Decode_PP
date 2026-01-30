@@ -60,6 +60,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -83,6 +84,7 @@ import java.util.List;
 import java.util.Vector;
 
 
+@Disabled
 @Autonomous(name="LeaveAuton", group="A")
 public class LeaveAuton extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
