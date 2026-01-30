@@ -74,9 +74,9 @@ public class RedAuton extends OpMode {
             case 2:
                 if(!follower.isBusy()) {
                     intake.setPower(1);
-                    shooter.setPower(0.75);
+                    shooter.setShooterPower(0.75);
                     sorter.shootBallsInPattern(patternState);
-                    shooter.setPower(0);
+                    shooter.setShooterPower(0);
                     intake.setPower(0);
 
                     follower.followPath(thirdPath,true);

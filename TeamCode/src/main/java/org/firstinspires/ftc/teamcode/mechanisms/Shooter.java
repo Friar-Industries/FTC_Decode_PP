@@ -17,11 +17,11 @@ public class Shooter {
         shooterRight.setDirection(DcMotorSimple.Direction.FORWARD);
         shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        shooterLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shooterLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void setPower(double power) {
+    public void setShooterPower(double power) {
         shooterLeft.setPower(power);
         shooterRight.setPower(power);
     }

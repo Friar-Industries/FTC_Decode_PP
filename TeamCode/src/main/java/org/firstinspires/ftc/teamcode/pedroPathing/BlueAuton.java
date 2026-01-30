@@ -30,8 +30,8 @@ public class BlueAuton extends OpMode {
     private Integer pathState;
     private final Pose startPose = new Pose(39.5,135,Math.toRadians(90));
     private final Pose obeliskPose = new Pose(60,112,Math.toRadians(80));
-    private final Pose shootPose = new Pose(58.35,84.28,Math.toRadians(125));
-    private final Pose endPose = new Pose(48.12,73,Math.toRadians(125));
+    private final Pose shootPose = new Pose(58.35,84.28,Math.toRadians(123));
+    private final Pose endPose = new Pose(48.12,73,Math.toRadians(123));
     private Path firstPath;
     private Path secondPath;
     private Path thirdPath;
@@ -74,9 +74,9 @@ public class BlueAuton extends OpMode {
             case 2:
                 if(!follower.isBusy()) {
                     intake.setPower(1);
-                    shooter.setPower(0.75);
+                    shooter.setShooterPower(0.72);
                     sorter.shootBallsInPattern(patternState);
-                    shooter.setPower(0);
+                    shooter.setShooterPower(0);
                     intake.setPower(0);
 
                     follower.followPath(thirdPath,true);

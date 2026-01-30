@@ -39,7 +39,7 @@ public class Sorter {
     }
 
     public void flickBall(int timeout) throws InterruptedException {
-        sleep(timeout);
+        sleep(timeout+1000);
         flick.setPosition(FINGER_ACTIVE);
         sleep(1000);
         flick.setPosition(FINGER_HOME);
@@ -47,7 +47,7 @@ public class Sorter {
     }
 
     public void setFinger(double pos) {
-
+        flick.setPosition(pos);
     }
 
     public void shootBallsInPattern(String pattern) throws InterruptedException {
@@ -59,6 +59,7 @@ public class Sorter {
                 flickBall(timeout);
                 move(SORTER_RIGHT);
                 flickBall(timeout);
+                break;
             case "PGP":
                 move(SORTER_LEFT);
                 flickBall(timeout);
@@ -66,6 +67,7 @@ public class Sorter {
                 flickBall(timeout);
                 move(SORTER_RIGHT);
                 flickBall(timeout);
+                break;
             case "PPG":
                 move(SORTER_LEFT);
                 flickBall(timeout);
@@ -73,6 +75,7 @@ public class Sorter {
                 flickBall(timeout);
                 move(SORTER_HOME);
                 flickBall(timeout);
+                break;
         }
     }
 }

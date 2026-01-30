@@ -268,7 +268,7 @@ public class DoubleDrive extends OpMode {
         }
 
         intake.setPower(intakeSpinning ? 1 : 0);
-        shooter.setPower(shooterSpinning ? power : 0);
+        shooter.setShooterPower(shooterSpinning ? power : 0);
 
         // FLICK BALL INTO SHOOTER
         if (gamepad2.right_bumper) {
