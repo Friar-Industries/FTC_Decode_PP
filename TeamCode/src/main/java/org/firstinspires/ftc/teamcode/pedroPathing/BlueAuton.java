@@ -73,7 +73,7 @@ public class BlueAuton extends OpMode {
                 break;
             case 2:
                 if(!follower.isBusy()) {
-                    intake.setPower(1);
+                    intake.setPower(0.75);
                     shooter.setShooterPower(0.72);
                     sorter.shootBallsInPattern(patternState);
                     shooter.setShooterPower(0);

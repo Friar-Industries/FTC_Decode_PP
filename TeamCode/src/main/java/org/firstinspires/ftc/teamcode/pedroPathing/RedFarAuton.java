@@ -29,8 +29,8 @@ public class RedFarAuton extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
     private final Pose startPose = new Pose(87.5,8.5,Math.toRadians(90));
-    private final Pose shootPose = new Pose(87.5,14,Math.toRadians(68));
-    private final Pose parkPose = new Pose(87.5,30,Math.toRadians(68));
+    private final Pose shootPose = new Pose(87.5,14,Math.toRadians(64));
+    private final Pose parkPose = new Pose(87.5,30,Math.toRadians(64));
     private Path firstPath;
     private Path secondPath;
     private DcMotor intake;
@@ -55,8 +55,8 @@ public class RedFarAuton extends OpMode {
                 break;
             case 1:
                 if(!follower.isBusy()) {
-                    intake.setPower(1);
-                    shooter.setShooterPower(0.85);
+                    intake.setPower(0.75);
+                    shooter.setShooterPower(0.82);
                     sorter.shootBallsInPattern(patternState);
                     sorter.shootBallsInPattern(patternState);
                     shooter.setShooterPower(0);

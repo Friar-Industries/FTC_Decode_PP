@@ -72,8 +72,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.Sorter;
 @TeleOp(name="DoubleDrive", group="A")
 public class DoubleDrive extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
-    private double power = 0.75;
-    private final double MIN_POWER = 0.75;
+    private double power = 0.7;
+    private final double MIN_POWER = 0.7;
     private final double MAX_POWER = 0.9;
     private double speed = 1;
     private final double LOW_SPEED = 0.6;
@@ -120,7 +120,7 @@ public class DoubleDrive extends OpMode {
                 telemetry.addData("tx", result.getTx());
                 telemetry.addData("ty", result.getTy());
                 telemetry.addData("Botpose", botpose.toString());
-                return result.getTx() - 10;
+                return result.getTx();
             }
         }
         return 0;
@@ -199,7 +199,7 @@ public class DoubleDrive extends OpMode {
         double yaw = gamepad1.right_stick_x;
 
         if (gamepad1.a) {
-            yaw = getAprilTagPosX()/160;
+            yaw = getAprilTagPosX()/140;
         }
 
         double frontLeftPower = axial + lateral + yaw;

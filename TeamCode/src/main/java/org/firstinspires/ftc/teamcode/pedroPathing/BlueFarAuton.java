@@ -55,8 +55,8 @@ public class BlueFarAuton extends OpMode {
                 break;
             case 1:
                 if(!follower.isBusy()) {
-                    intake.setPower(1);
-                    shooter.setShooterPower(0.85);
+                    intake.setPower(0.75);
+                    shooter.setShooterPower(0.82);
                     sorter.shootBallsInPattern(patternState);
                     sorter.shootBallsInPattern(patternState);
                     shooter.setShooterPower(0);
