@@ -29,8 +29,8 @@ public class BlueFarAuton extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
     private final Pose startPose = new Pose(56.5,8.5,Math.toRadians(90));
-    private final Pose shootPose = new Pose(56.5,17,Math.toRadians(107));
-    private final Pose parkPose = new Pose(56.5,30,Math.toRadians(107));
+    private final Pose shootPose = new Pose(56.5,17,Math.toRadians(109));
+    private final Pose parkPose = new Pose(56.5,30,Math.toRadians(109));
     private Path firstPath;
     private Path secondPath;
     private DcMotor intake;
@@ -56,7 +56,7 @@ public class BlueFarAuton extends OpMode {
             case 1:
                 if(!follower.isBusy()) {
                     intake.setPower(0.75);
-                    shooter.setShooterPower(0.82);
+                    shooter.setShooterPower(0.8);
                     sorter.shootBallsInPattern(patternState);
                     sorter.shootBallsInPattern(patternState);
                     shooter.setShooterPower(0);

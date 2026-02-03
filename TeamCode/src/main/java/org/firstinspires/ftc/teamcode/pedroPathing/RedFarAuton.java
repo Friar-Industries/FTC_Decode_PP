@@ -56,7 +56,7 @@ public class RedFarAuton extends OpMode {
             case 1:
                 if(!follower.isBusy()) {
                     intake.setPower(0.75);
-                    shooter.setShooterPower(0.82);
+                    shooter.setShooterPower(0.8);
                     sorter.shootBallsInPattern(patternState);
                     sorter.shootBallsInPattern(patternState);
                     shooter.setShooterPower(0);

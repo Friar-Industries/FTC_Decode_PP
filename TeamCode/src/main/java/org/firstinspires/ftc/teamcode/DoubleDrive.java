@@ -72,8 +72,8 @@ import org.firstinspires.ftc.teamcode.mechanisms.Sorter;
 @TeleOp(name="DoubleDrive", group="A")
 public class DoubleDrive extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
-    private double power = 0.7;
-    private final double MIN_POWER = 0.7;
+    private double power = 0.75;
+    private final double MIN_POWER = 0.75;
     private final double MAX_POWER = 0.9;
     private double speed = 1;
     private final double LOW_SPEED = 0.6;

@@ -28,7 +28,7 @@ public class RedAuton extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
-    private final Pose startPose = new Pose(104.5,135,Math.toRadians(90));
+    private final Pose startPose = new Pose(113,134.5,Math.toRadians(90));
     private final Pose obeliskPose = new Pose(84,112,Math.toRadians(95));
     private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(58));
     private final Pose endPose = new Pose(95.88,73,Math.toRadians(58));
@@ -74,7 +74,7 @@ public class RedAuton extends OpMode {
             case 2:
                 if(!follower.isBusy()) {
                     intake.setPower(0.75);
-                    shooter.setShooterPower(0.72);
+                    shooter.setShooterPower(0.7);
                     sorter.shootBallsInPattern(patternState);
                     shooter.setShooterPower(0);
                     intake.setPower(0);
