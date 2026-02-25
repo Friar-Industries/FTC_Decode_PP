@@ -28,19 +28,26 @@ public class RedBetterAuton extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
-    private double preCollect = 104;
+    private double preCollect = 100;
     private double[] artifactY = {84};
-    private double[] artifactX = {110,114};
+    private double[] artifactX = {109,114,119};
+    private double artifactHeading = 180;
     private final Pose startPose = new Pose(118,132,Math.toRadians(126));
     private final Pose obeliskPose = new Pose(95,116,Math.toRadians(126));
     private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(58));
-    private final Pose collectPose = new Pose(preCollect,artifactY[0],Math.toRadians(180));
-    private final Pose artifact1Pose = new Pose(artifactX[0],artifactY[0], Math.toRadians(180));
-    private final Pose artifact2Pose = new Pose(artifactX[1], artifactY[0],Math.toRadians(180));
+    private final Pose collectPose = new Pose(preCollect,artifactY[0],Math.toRadians(artifactHeading));
+    private final Pose artifact1Pose = new Pose(artifactX[0],artifactY[0], Math.toRadians(artifactHeading));
+    private final Pose artifact2Pose = new Pose(artifactX[1], artifactY[0],Math.toRadians(artifactHeading));
+    private final Pose artifact3Pose = new Pose(artifactX[2], artifactY[0],Math.toRadians(artifactHeading));
     private final Pose endPose = new Pose(95.88,73,Math.toRadians(58));
     private Path firstPath;
     private Path secondPath;
     private Path thirdPath;
+    private Path fourthPath;
+    private Path fifthPath;
+    private Path sixthPath;
+    private Path seventhPath;
+    private Path eighthPath;
     private DcMotor intake;
     private Shooter shooter = new Shooter();
     private Sorter sorter = new Sorter();
@@ -53,8 +60,19 @@ public class RedBetterAuton extends OpMode {
         firstPath.setLinearHeadingInterpolation(startPose.getHeading(),obeliskPose.getHeading());
         secondPath = new Path(new BezierLine(obeliskPose,shootPose));
         secondPath.setLinearHeadingInterpolation(obeliskPose.getHeading(),shootPose.getHeading());
-        thirdPath = new Path(new BezierLine(shootPose,endPose));
-        thirdPath.setLinearHeadingInterpolation(shootPose.getHeading(),endPose.getHeading());
+        thirdPath = new Path(new BezierLine(shootPose,collectPose));
+        thirdPath.setLinearHeadingInterpolation(shootPose.getHeading(),collectPose.getHeading());
+        fourthPath = new Path(new BezierLine(collectPose,artifact1Pose));
+        fourthPath.setLinearHeadingInterpolation(collectPose.getHeading(),artifact1Pose.getHeading());
+        fifthPath = new Path(new BezierLine(artifact1Pose,artifact2Pose));
+        fifthPath.setLinearHeadingInterpolation(artifact1Pose.getHeading(),artifact2Pose.getHeading());
+        sixthPath = new Path(new BezierLine(artifact2Pose,artifact3Pose));
+        sixthPath.setLinearHeadingInterpolation(artifact2Pose.getHeading(),artifact3Pose.getHeading());
+        seventhPath = new Path(new BezierLine(artifact3Pose,shootPose));
+        seventhPath.setLinearHeadingInterpolation(artifact3Pose.getHeading(),shootPose.getHeading());
+        eighthPath = new Path(new BezierLine(shootPose,endPose));
+        eighthPath.setLinearHeadingInterpolation(shootPose.getHeading(),endPose.getHeading());
+
     }
 
     public void autonomousPathUpdate() throws InterruptedException {
@@ -87,6 +105,51 @@ public class RedBetterAuton extends OpMode {
 
                     follower.followPath(thirdPath,true);
                     setPathState(3);
+                }
+                break;
+            case 3:
+                if(!follower.isBusy()) {
+                    sorter.left();
+                    intake.setPower(0.75);
+
+                    follower.followPath(fourthPath,true);
+                    setPathState(4);
+                }
+                break;
+            case 4:
+                if(!follower.isBusy()) {
+                    sorter.right();
+
+                    follower.followPath(fifthPath,true);
+                    setPathState(5);
+                }
+                break;
+            case 5:
+                if(!follower.isBusy()) {
+                    sorter.home();
+
+                    follower.followPath(sixthPath,true);
+                    setPathState(6);
+                }
+                break;
+            case 6:
+                if(!follower.isBusy()) {
+                    intake.setPower(0);
+
+                    follower.followPath(seventhPath,true);
+                    setPathState(7);
+                }
+                break;
+            case 7:
+                if(!follower.isBusy()) {
+                    intake.setPower(0.75);
+                    shooter.setShooterPower(0.7);
+                    sorter.shootBallsInPattern(patternState);
+                    shooter.setShooterPower(0);
+                    intake.setPower(0);
+
+                    follower.followPath(eighthPath,true);
+                    setPathState(8);
                 }
                 break;
         }
