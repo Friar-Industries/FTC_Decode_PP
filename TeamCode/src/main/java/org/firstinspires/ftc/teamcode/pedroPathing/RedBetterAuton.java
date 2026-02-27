@@ -4,6 +4,8 @@ PRELOAD GREEN IN BOTTOM, PURPS ON TOP
 
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import static java.lang.Thread.sleep;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -28,14 +30,15 @@ public class RedBetterAuton extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
-    private double preCollect = 100;
-    private double[] artifactY = {84};
-    private double[] artifactX = {109,114,119};
-    private double artifactHeading = 180;
+    private double preCollect = 92;
+    private double[] artifactY = {85};
+    private double[] artifactX = {105,110,115};
+    private double artifactHeading = 190;
     private final Pose startPose = new Pose(118,132,Math.toRadians(126));
     private final Pose obeliskPose = new Pose(95,116,Math.toRadians(126));
     private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(58));
-    private final Pose collectPose = new Pose(preCollect,artifactY[0],Math.toRadians(artifactHeading));
+    private final Pose collectPose = new Pose(preCollect,artifactY[0],Math.toRadians(artifactHeading-30));
+    private final Pose preCollectPose = new Pose(102,artifactY[0],Math.toRadians(artifactHeading));
     private final Pose artifact1Pose = new Pose(artifactX[0],artifactY[0], Math.toRadians(artifactHeading));
     private final Pose artifact2Pose = new Pose(artifactX[1], artifactY[0],Math.toRadians(artifactHeading));
     private final Pose artifact3Pose = new Pose(artifactX[2], artifactY[0],Math.toRadians(artifactHeading));
@@ -43,6 +46,7 @@ public class RedBetterAuton extends OpMode {
     private Path firstPath;
     private Path secondPath;
     private Path thirdPath;
+    private Path extraPath;
     private Path fourthPath;
     private Path fifthPath;
     private Path sixthPath;
@@ -54,6 +58,7 @@ public class RedBetterAuton extends OpMode {
     private Limelight3A limelight;
     private int[] pattern = {0,0,0};
     private String patternState = "PPG";
+    private int sorterTimeout = 1000;
 
     public void buildPaths() {
         firstPath = new Path(new BezierLine(startPose,obeliskPose));
@@ -62,8 +67,10 @@ public class RedBetterAuton extends OpMode {
         secondPath.setLinearHeadingInterpolation(obeliskPose.getHeading(),shootPose.getHeading());
         thirdPath = new Path(new BezierLine(shootPose,collectPose));
         thirdPath.setLinearHeadingInterpolation(shootPose.getHeading(),collectPose.getHeading());
-        fourthPath = new Path(new BezierLine(collectPose,artifact1Pose));
-        fourthPath.setLinearHeadingInterpolation(collectPose.getHeading(),artifact1Pose.getHeading());
+        extraPath = new Path(new BezierLine(collectPose,preCollectPose));
+        extraPath.setLinearHeadingInterpolation(collectPose.getHeading(),preCollectPose.getHeading());
+        fourthPath = new Path(new BezierLine(preCollectPose,artifact1Pose));
+        fourthPath.setLinearHeadingInterpolation(preCollectPose.getHeading(),artifact1Pose.getHeading());
         fifthPath = new Path(new BezierLine(artifact1Pose,artifact2Pose));
         fifthPath.setLinearHeadingInterpolation(artifact1Pose.getHeading(),artifact2Pose.getHeading());
         sixthPath = new Path(new BezierLine(artifact2Pose,artifact3Pose));
@@ -103,14 +110,14 @@ public class RedBetterAuton extends OpMode {
                     shooter.setShooterPower(0);
                     intake.setPower(0);
 
+                    follower.setMaxPower(0.75);
                     follower.followPath(thirdPath,true);
-                    setPathState(3);
+                    setPathState(8);
                 }
                 break;
             case 3:
                 if(!follower.isBusy()) {
-                    sorter.left();
-                    intake.setPower(0.75);
+                    follower.setMaxPower(1);
 
                     follower.followPath(fourthPath,true);
                     setPathState(4);
@@ -118,7 +125,9 @@ public class RedBetterAuton extends OpMode {
                 break;
             case 4:
                 if(!follower.isBusy()) {
+                    sleep(sorterTimeout/2);
                     sorter.right();
+                    sleep(sorterTimeout);
 
                     follower.followPath(fifthPath,true);
                     setPathState(5);
@@ -126,7 +135,9 @@ public class RedBetterAuton extends OpMode {
                 break;
             case 5:
                 if(!follower.isBusy()) {
+                    sleep(sorterTimeout/2);
                     sorter.home();
+                    sleep(sorterTimeout);
 
                     follower.followPath(sixthPath,true);
                     setPathState(6);
@@ -134,6 +145,7 @@ public class RedBetterAuton extends OpMode {
                 break;
             case 6:
                 if(!follower.isBusy()) {
+                    sleep(sorterTimeout);
                     intake.setPower(0);
 
                     follower.followPath(seventhPath,true);
@@ -149,7 +161,17 @@ public class RedBetterAuton extends OpMode {
                     intake.setPower(0);
 
                     follower.followPath(eighthPath,true);
-                    setPathState(8);
+                    setPathState(9);
+                }
+                break;
+            case 8:
+                if(!follower.isBusy()) {
+                    sorter.left();
+                    sleep(sorterTimeout);
+                    intake.setPower(0.75);
+
+                    follower.followPath(extraPath,true);
+                    setPathState(3);
                 }
                 break;
         }

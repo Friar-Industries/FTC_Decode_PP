@@ -9,7 +9,7 @@ public class Sorter {
     private Servo sorter;
     private Servo flick;
     private final double FINGER_HOME = 1;
-    private final double FINGER_ACTIVE = 0.1;
+    private final double FINGER_ACTIVE = 0.5;
     private final double SORTER_LEFT = 0.06;
     private final double SORTER_HOME = 0.5;
     private final double SORTER_RIGHT = 0.94;
@@ -39,11 +39,11 @@ public class Sorter {
     }
 
     public void flickBall(int timeout) throws InterruptedException {
-        sleep(timeout+1000);
+        sleep(timeout+500);
         flick.setPosition(FINGER_ACTIVE);
         sleep(1000);
         flick.setPosition(FINGER_HOME);
-        sleep(timeout);
+        sleep(timeout-250);
     }
 
     public void setFinger(double pos) {
