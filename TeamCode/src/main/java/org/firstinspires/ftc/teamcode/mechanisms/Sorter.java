@@ -39,11 +39,11 @@ public class Sorter {
     }
 
     public void flickBall(int timeout) throws InterruptedException {
-        sleep(timeout+500);
+        sleep(timeout);
         flick.setPosition(FINGER_ACTIVE);
-        sleep(1000);
+        sleep(750);
         flick.setPosition(FINGER_HOME);
-        sleep(timeout-250);
+        sleep(timeout-50);
     }
 
     public void setFinger(double pos) {

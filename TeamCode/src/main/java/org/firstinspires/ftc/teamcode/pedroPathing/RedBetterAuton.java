@@ -31,18 +31,18 @@ public class RedBetterAuton extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
     private double preCollect = 92;
-    private double[] artifactY = {85};
+    private double[] artifactY = {86};
     private double[] artifactX = {105,110,115};
-    private double artifactHeading = 190;
+    private double artifactHeading = 180;
     private final Pose startPose = new Pose(118,132,Math.toRadians(126));
     private final Pose obeliskPose = new Pose(95,116,Math.toRadians(126));
-    private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(58));
-    private final Pose collectPose = new Pose(preCollect,artifactY[0],Math.toRadians(artifactHeading-30));
+    private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(55));
+    private final Pose collectPose = new Pose(preCollect,artifactY[0],Math.toRadians(artifactHeading));
     private final Pose preCollectPose = new Pose(102,artifactY[0],Math.toRadians(artifactHeading));
     private final Pose artifact1Pose = new Pose(artifactX[0],artifactY[0], Math.toRadians(artifactHeading));
     private final Pose artifact2Pose = new Pose(artifactX[1], artifactY[0],Math.toRadians(artifactHeading));
     private final Pose artifact3Pose = new Pose(artifactX[2], artifactY[0],Math.toRadians(artifactHeading));
-    private final Pose endPose = new Pose(95.88,73,Math.toRadians(58));
+    private final Pose endPose = new Pose(95.88,73,Math.toRadians(55));
     private Path firstPath;
     private Path secondPath;
     private Path thirdPath;
@@ -106,9 +106,11 @@ public class RedBetterAuton extends OpMode {
                 if(!follower.isBusy()) {
                     intake.setPower(0.75);
                     shooter.setShooterPower(0.7);
+                    sleep(1000);
                     sorter.shootBallsInPattern(patternState);
                     shooter.setShooterPower(0);
-                    intake.setPower(0);
+                    sorter.left();
+                    intake.setPower(0.75);
 
                     follower.setMaxPower(0.75);
                     follower.followPath(thirdPath,true);
@@ -117,7 +119,7 @@ public class RedBetterAuton extends OpMode {
                 break;
             case 3:
                 if(!follower.isBusy()) {
-                    follower.setMaxPower(1);
+                    follower.setMaxPower(.5);
 
                     follower.followPath(fourthPath,true);
                     setPathState(4);
@@ -125,9 +127,9 @@ public class RedBetterAuton extends OpMode {
                 break;
             case 4:
                 if(!follower.isBusy()) {
-                    sleep(sorterTimeout/2);
-                    sorter.right();
                     sleep(sorterTimeout);
+                    sorter.right();
+                    sleep(sorterTimeout+500);
 
                     follower.followPath(fifthPath,true);
                     setPathState(5);
@@ -135,9 +137,9 @@ public class RedBetterAuton extends OpMode {
                 break;
             case 5:
                 if(!follower.isBusy()) {
-                    sleep(sorterTimeout/2);
-                    sorter.home();
                     sleep(sorterTimeout);
+                    sorter.home();
+                    sleep(sorterTimeout+500);
 
                     follower.followPath(sixthPath,true);
                     setPathState(6);
@@ -145,9 +147,10 @@ public class RedBetterAuton extends OpMode {
                 break;
             case 6:
                 if(!follower.isBusy()) {
-                    sleep(sorterTimeout);
+                    sleep(sorterTimeout+500);
                     intake.setPower(0);
 
+                    follower.setMaxPower(1);
                     follower.followPath(seventhPath,true);
                     setPathState(7);
                 }
@@ -166,9 +169,6 @@ public class RedBetterAuton extends OpMode {
                 break;
             case 8:
                 if(!follower.isBusy()) {
-                    sorter.left();
-                    sleep(sorterTimeout);
-                    intake.setPower(0.75);
 
                     follower.followPath(extraPath,true);
                     setPathState(3);
