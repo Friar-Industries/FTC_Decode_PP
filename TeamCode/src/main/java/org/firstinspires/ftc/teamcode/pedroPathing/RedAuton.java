@@ -30,8 +30,8 @@ public class RedAuton extends OpMode {
     private Integer pathState;
     private final Pose startPose = new Pose(118,132,Math.toRadians(126));
     private final Pose obeliskPose = new Pose(84,112,Math.toRadians(95));
-    private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(58));
-    private final Pose endPose = new Pose(95.88,73,Math.toRadians(58));
+    private final Pose shootPose = new Pose(84.65,85.28,Math.toRadians(54));
+    private final Pose endPose = new Pose(95.88,73,Math.toRadians(55));
     private Path firstPath;
     private Path secondPath;
     private Path thirdPath;

@@ -36,7 +36,7 @@ public class RedBetterAuton extends OpMode {
     private double artifactHeading = 180;
     private final Pose startPose = new Pose(118,132,Math.toRadians(126));
     private final Pose obeliskPose = new Pose(95,116,Math.toRadians(126));
-    private final Pose shootPose = new Pose(85.65,84.28,Math.toRadians(55));
+    private final Pose shootPose = new Pose(84.65,85.28,Math.toRadians(53));
     private final Pose collectPose = new Pose(preCollect,artifactY[0],Math.toRadians(artifactHeading));
     private final Pose preCollectPose = new Pose(102,artifactY[0],Math.toRadians(artifactHeading));
     private final Pose artifact1Pose = new Pose(artifactX[0],artifactY[0], Math.toRadians(artifactHeading));
@@ -106,7 +106,7 @@ public class RedBetterAuton extends OpMode {
                 if(!follower.isBusy()) {
                     intake.setPower(0.75);
                     shooter.setShooterPower(0.7);
-                    sleep(1000);
+                    sleep(750);
                     sorter.shootBallsInPattern(patternState);
                     shooter.setShooterPower(0);
                     sorter.left();
@@ -129,7 +129,7 @@ public class RedBetterAuton extends OpMode {
                 if(!follower.isBusy()) {
                     sleep(sorterTimeout);
                     sorter.right();
-                    sleep(sorterTimeout+500);
+                    sleep(sorterTimeout);
 
                     follower.followPath(fifthPath,true);
                     setPathState(5);
@@ -139,7 +139,7 @@ public class RedBetterAuton extends OpMode {
                 if(!follower.isBusy()) {
                     sleep(sorterTimeout);
                     sorter.home();
-                    sleep(sorterTimeout+500);
+                    sleep(sorterTimeout);
 
                     follower.followPath(sixthPath,true);
                     setPathState(6);

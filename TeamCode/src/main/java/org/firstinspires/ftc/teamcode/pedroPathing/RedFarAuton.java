@@ -4,6 +4,8 @@ PRELOAD GREEN IN BOTTOM, PURPS ON TOP
 
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import static java.lang.Thread.sleep;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -28,11 +30,9 @@ public class RedFarAuton extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private Integer pathState;
-    private final Pose startPose = new Pose(87.5,8.5,Math.toRadians(90));
-    private final Pose shootPose = new Pose(87.5,14,Math.toRadians(64));
-    private final Pose parkPose = new Pose(87.5,30,Math.toRadians(64));
+    private final Pose startPose = new Pose(87.5,8.5,Math.toRadians(65));
+    private final Pose parkPose = new Pose(87.5,30,Math.toRadians(65));
     private Path firstPath;
-    private Path secondPath;
     private DcMotor intake;
     private Shooter shooter = new Shooter();
     private Sorter sorter = new Sorter();
@@ -41,30 +41,23 @@ public class RedFarAuton extends OpMode {
     private String patternState = "PPG";
 
     public void buildPaths() {
-        firstPath = new Path(new BezierLine(startPose,shootPose));
-        firstPath.setLinearHeadingInterpolation(startPose.getHeading(),shootPose.getHeading());
-        secondPath = new Path(new BezierLine(shootPose,parkPose));
-        secondPath.setLinearHeadingInterpolation(shootPose.getHeading(),parkPose.getHeading());
+        firstPath = new Path(new BezierLine(startPose,parkPose));
+        firstPath.setLinearHeadingInterpolation(startPose.getHeading(),parkPose.getHeading());
     }
 
     public void autonomousPathUpdate() throws InterruptedException {
         switch (pathState) {
             case 0:
-                follower.followPath(firstPath);
-                setPathState(1);
-                break;
-            case 1:
-                if(!follower.isBusy()) {
-                    intake.setPower(0.75);
-                    shooter.setShooterPower(0.8);
-                    sorter.shootBallsInPattern(patternState);
-                    sorter.shootBallsInPattern(patternState);
-                    shooter.setShooterPower(0);
-                    intake.setPower(0);
+                intake.setPower(0.75);
+                shooter.setShooterPower(0.75);
+                sleep(2000);
+                sorter.shootBallsInPattern(patternState);
+                sorter.shootBallsInPattern(patternState);
+                shooter.setShooterPower(0);
+                intake.setPower(0);
 
-                    follower.followPath(secondPath,true);
-                    setPathState(2);
-                }
+                follower.followPath(firstPath,true);
+                setPathState(1);
                 break;
         }
     }

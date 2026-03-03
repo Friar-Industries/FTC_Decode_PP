@@ -4,6 +4,8 @@ PRELOAD GREEN IN BOTTOM, PURPS ON TOP
 
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import static java.lang.Thread.sleep;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -57,6 +59,7 @@ public class BlueFarAuton extends OpMode {
                 if(!follower.isBusy()) {
                     intake.setPower(0.75);
                     shooter.setShooterPower(0.8);
+                    sleep(1000);
                     sorter.shootBallsInPattern(patternState);
                     sorter.shootBallsInPattern(patternState);
                     shooter.setShooterPower(0);

@@ -10,7 +10,7 @@ public class Sorter {
     private Servo flick;
     private final double FINGER_HOME = 1;
     private final double FINGER_ACTIVE = 0.5;
-    private final double SORTER_LEFT = 0.06;
+    private final double SORTER_LEFT = 0.07;
     private final double SORTER_HOME = 0.5;
     private final double SORTER_RIGHT = 0.94;
 
@@ -52,6 +52,7 @@ public class Sorter {
 
     public void shootBallsInPattern(String pattern) throws InterruptedException {
         int timeout = 1000;
+        //sleep(1000);
         switch (pattern) {
             case "GPP":
                 flickBall(timeout);
